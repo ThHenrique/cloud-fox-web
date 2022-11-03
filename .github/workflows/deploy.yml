@@ -2,9 +2,9 @@ name: Deploy AWS - CI
 
 on:
   push:
-    branches: [development]
+    branches: [main]
   pull_request:
-    branches: [development]
+    branches: [main]
 
 jobs:
   build:
@@ -27,5 +27,17 @@ jobs:
       - name: Build Project
         run: npm run build
 
-      - name: Copy files
-        run: cp -R build/* /var/www/html
+			- uses: actions/upload-artifact@v1
+				with:
+      		name: buildfiles
+        	path: build/*
+
+	download_build:
+		name: Download Build
+		runs-on: self-hosted
+		needs: build
+		steps:
+			- uses: actions/download-artifact@v1
+        with:
+          name: buildfiles
+      - run: cat _redirects
