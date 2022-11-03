@@ -1,43 +1,42 @@
-name: Deploy AWS - CI
-
-on:
-  push:
+name: Deploy-frontend
+on: 
+  push:	
+    branches: [main]	
+  pull_request:	
     branches: [main]
-  pull_request:
-    branches: [main]
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install node
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '18'
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
-      - name: Build Project
+      - name: Build project
         run: npm run build
 
-			- uses: actions/upload-artifact@v1
-				with:
-      		name: buildfiles
-        	path: build/*
-
-	download_build:
-		name: Download Build
-		runs-on: self-hosted
-		needs: build
-		steps:
-			- uses: actions/download-artifact@v1
+      - name: Upload build folder
+      - uses: actions/upload-artifact@1
         with:
-          name: buildfiles
+          name: buildfolder
+          path: build/*
+          
+  download_build_folder:
+    name: Download build folder
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: buildfolder
       - run: cat _redirects
+        
+    
